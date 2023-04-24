@@ -9,6 +9,7 @@ const form = document.querySelector('form')
 const submit = document.querySelector('#submit')
 const input = document.querySelectorAll('input')
 
+
 // New elements
 const invalidDate = document.createElement('p')
 let fullDate // date created with input value
@@ -20,97 +21,97 @@ const inputError = (element) => { // add style if error in inputs
   element.parentNode.style.color = "hsl(0, 100%, 67%)"
   element.style.transition = "all ease .5 s"
   element.parentNode.style.transition = "all ease .5s"
+  submit.disabled = true 
+  submit.style.background = 'hsl(0, 100%, 67%)'  
 }
 const inputErrorReverse = (element) => { // remove style error rectified in inputs
-
   element.style.outline = ""
   element.style.color = ""
   element.parentNode.style.color = ""
   element.style.transition = "all ease .5s"
   element.parentNode.style.transition = "all ease .5s"
+  submit.disabled = false
 }
 
 
 input.forEach((element) => { // check if input.values are correct (eventListener 'input')
   // add 
   let error = ''
-  errorMessage = document.createElement('p')
+  let errorMessage = document.createElement('p')
   errorMessage.classList.add('errorMessage')
   element.parentNode.append(errorMessage)
+
 
   element.addEventListener('input', () => { // live correction listening
 
     if (element.value === '') { // empty input
       error = ''
+      errorMessage.innerText = ''
     } else if (!Number.isInteger(parseInt(element.value))) { // check if is a number // add function for add error if contains letter
       error = `ce n'est pas un nombre`
-      console.log(error)
     } else if (element.getAttribute('id') === 'day') { // check values for day
       if (parseInt(day.value) > 0 && (day.value) < 32) {
-        error = ''
+        return
       } else {
-        error = `valeur jour incorrecte`
+        error = "jour incorrect"
       }
     } else if (element.getAttribute('id') === 'month') { // check values for month
-      if (parseInt(day.value) > 0 && (day.value) < 12) {
-        const dayValue = day.value
-        return dayValue
+      if (parseInt(month.value) > 0 && (month.value) < 12) {
+        return
       } else {
-        // error = 'la valeur indiquée dans le champ ' + this.element.getAttribute()
+        error = 'mois incorrect ' 
       }
     } else if (element.getAttribute('id') === 'year') { // check values for year
       if (parseInt(year.value) > 0) {
-        const dayValue = day.value
-        return dayValue
+        return 
       } else {
         return
       }
     } else {
-      return
+        error = ''
+        errorMessage.innerText = ''
     }
-    errorMessage.innerText = error
     if (error !== '') { // add option to check other error
-      submit.disabled = true
+      console.error(error)
+      errorMessage.innerText = error
+      console.log(errorMessage.innerText)
       inputError(element)
-      errorMessage.style.opacity = "1"
-      submit.style.background = 'hsl(0, 100%, 67%)'
-      errorMessage.style.transition = "all ease .5 s"
-      submit.style.transition = "all ease .5s"
-    } else {
-      submit.style.background = ""
-      errorMessage.style.opacity = "0"
+      element.parentNode.style.opacity = "1"
+      // submit.style.background = 'hsl(0, 100%, 67%)'  
 
-
-      inputErrorReverse(element)
-      // element.style.outline = ""
-      // element.style.color = ""
-      // element.parentNode.style.color = ""
-      // element.style.transition = "all ease .5s"
-      // element.parentNode.style.transition = "all ease .5s"
+      element.parentNode.style.transition = "all ease .5 s"
+      // submit.style.transition = "all ease .5s"
+    } else { 
       // errorMessage.style.opacity = "0"
+      inputErrorReverse(element)
+      // errorMessage.style.transition = "all ease .5s"
+    }
+
+    // get all error message and convert the object (html collection, seems array but is nt)
+    let all = document.getElementsByClassName('errorMessage')
+    all = [...all]
+
+    if (all.every(element => element.innerText==='')) {
+      submit.style.background = ""
+      submit.diabled = false
 
       submit.style.background = ""
-      errorMessage.style.transition = "all ease .5s"
       submit.style.transition = "all ease .5s"
-      // console.log('il n y a pas d erreur')
       return
     }
   })
 })
 
-
-
 const fullDateCheck = () => { // 
   fullDate = new Date(year.value, month.value - 1, day.value)
   if (parseInt(day.value) === fullDate.getDate() &&
     parseInt(month.value) === fullDate.getMonth() + 1 &&
-    parseInt(year.value) === fullDate.getFullYear()){
-      return true
-    } else {
-      return false
+    parseInt(year.value) === fullDate.getFullYear()) {
+    return true
+  } else {
+    return false
   }
 }
-
 
 function calculate(event) {
   event.preventDefault()
@@ -119,8 +120,6 @@ function calculate(event) {
   input.forEach((element) => {
     inputErrorReverse(element)
   })
-
-
   //check date input is valid
   if (fullDateCheck()) {
     const today = new Date()
@@ -139,13 +138,12 @@ function calculate(event) {
     yearOut.innerText = theDate.getFullYear()
   } else {
     error = `la date n'est pas valide`
+    input.forEach(element => inputError(element))
     invalidDate.innerText = error
     invalidDate.classList.add('errorMessage', "dateError")
-
     invalidDate.style.opacity = "1"
     invalidDate.style.transition = "all .5s ease"
     submit.parentNode.append(invalidDate)
-    console.error(submit.parentNode)
     input.forEach((element) => {
       inputError(element)
     })
